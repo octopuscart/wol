@@ -10,8 +10,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo base_url(); ?>assets/assets/images/favicon.png">
-    <title>AdminBite admin Template - The Ultimate Multipurpose admin template</title>
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo base_url(); ?>assets/assets/images/icon.png">
+    <title>WOL Admin</title>
     <!-- Custom CSS -->
     <link href="<?php echo base_url(); ?>assets/dist/css/style.min.css" rel="stylesheet">
      <link href="<?php echo base_url(); ?>assets/gritter/css/jquery.gritter.css" rel="stylesheet" />
@@ -44,7 +44,7 @@
             <div class="auth-box">
                 <div id="loginform">
                     <div class="logo">
-                        <h5 class="font-medium m-b-20">Sign In to Admin</h5>
+                        <h5 class="font-medium m-b-20"><img src="<?php echo base_url(); ?>assets/assets/images/logo.png" style="width: 100%;"/></h5>
                     </div>
                     <!-- Form -->
                     <div class="row">

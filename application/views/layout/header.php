@@ -15,51 +15,36 @@
 
         <?php
         $styleSheetArray = array(
-            "Jquery" => "assets/plugins/jquery-ui/themes/base/minified/jquery-ui.min.css",
-            "Bootstrap3" => "assets/plugins/bootstrap/css/bootstrap.min.css",
-            "FontAwesome" => "assets/plugins/font-awesome/css/font-awesome.min.css",
-            "Animate" => "assets/css/animate.min.css",
-            "Style" => "assets/css/style.min.css",
-            "StyleResponsive" => "assets/css/style-responsive.min.css",
-            "Default" => "assets/css/theme/default.css",
-            "CustomeStyle" => "assets/css/customstyle.css",
-            "IonicIcon" => "assets/plugins/ionicons/css/ionicons.min.css",
-            "Gitter" => "assets/plugins/gritter/css/jquery.gritter.css",
-            "DataTable" => "assets/plugins/DataTables/css/data-table.css",
-            "Sweet Alert" => "assets/sweetalert2/sweetalert2.min.css",
+
+//            "Animate" => "assets/css/animate.min.css",
+            "Style" => "assets/dist/css/style.min.css",
+
+//            "CustomeStyle" => "assets/css/customstyle.css",
+
+            "Gitter" => "assets/gritter/css/jquery.gritter.css",
         );
         foreach ($styleSheetArray as $title => $stylesheet) {
             ?>
-                                                                    <!-- ================== <?php echo $title ?> ================== -->
+                                    <!-- ================== <?php echo $title ?> ================== -->
             <link href="<?php echo base_url(); ?><?php echo $stylesheet; ?>" rel="stylesheet" />
             <?php
         }
         ?>
 
 
+<!-- ============================================================== -->
+<script src="<?php echo base_url(); ?>assets/assets/libs/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap tether Core JavaScript -->
+<script src="<?php echo base_url(); ?>assets/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+<script src="<?php echo base_url(); ?>assets/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
 
-        <!-- end page container -->	
-        <!-- ================== BEGIN BASE JS ================== -->
 
-        <script src="<?php echo base_url(); ?>assets/plugins/jquery/jquery-1.9.1.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/plugins/jquery-ui/ui/minified/jquery-ui.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/plugins/moment/moment.min.js"></script>
-        <script src="<?php echo base_url(); ?>assets/plugins/DataTables/js/jquery.dataTables.js"></script>
-        <!--[if lt IE 9]>
-                <script src="assets/crossbrowserjs/html5shiv.js"></script>
-                <script src="assets/crossbrowserjs/respond.min.js"></script>
-                <script src="assets/crossbrowserjs/excanvas.min.js"></script>
-        <![endif]-->
 
-        <!-- ================== BEGIN BASE JS ================== -->
-        <script src="<?php echo base_url(); ?>assets/plugins/pace/pace.min.js"></script>
-        <!-- ================== END BASE JS ================== -->
-
-        <script src="<?php echo base_url(); ?>assets/sweetalert2/sweetalert2.min.js"></script>
         <!--angular js-->
         <script src="<?php echo base_url(); ?>assets/angular/angular.min.js"></script>
+              <!--sweet alert-->
+        <script src="<?php echo base_url(); ?>assets/sweetalert2/sweetalert2.min.js"></script>
+        <link rel="stylesheet" href="<?php echo base_url(); ?>assets/sweetalert2/sweetalert2.min.css">
 
         <!--custom style-->
         <style>
@@ -79,22 +64,9 @@
             $httpProvider.defaults.headers.post = {};
             });
             var rootBaseUrl = '<?php echo site_url("/"); ?>';
-            var rootAssetUrl = '<?php echo base_url(); ?>';
-            var contextgbl = new AudioContext();
-            var globlelogo = "<?php echo base_url(); ?>assets/img/notification.jpg";
-            var globleicon = "<?php echo base_url(); ?>assets/img/mobileicon1.png";
         </script>
-
-
-        <audio id="alertSound">
-            <source src="<?php echo base_url(); ?>assets/sound/sendemail.mp3" type="audio/mpeg">
-        </audio>
-
-
-
         <!-- begin #page-loader -->
         <div id="page-loader" class="fade in"><span class="spinner"></span></div>
         <!-- end #page-loader -->
         <!-- begin #page-container -->
         <div id="page-container" class="page-sidebar-fixed page-header-fixed" ng-controller="rootController">
-           

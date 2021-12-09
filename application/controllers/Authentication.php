@@ -14,7 +14,7 @@ class Authentication extends CI_Controller {
         $data['login_user'] = $this->session->userdata('logged_in');
         $userdata = $this->userdata;
         if ($userdata) {
-            redirect("Account/getContact", "refresh");
+            redirect("Account/getCollection", "refresh");
         } else {
             //        redirect("Authentication/index");
         }
@@ -23,7 +23,7 @@ class Authentication extends CI_Controller {
         if (isset($_POST['signIn'])) {
             $username = $this->input->post('email');
             $password = $this->input->post('password');
-            $this->db->select('id,name,last_name,email,password,user_type, image');
+            $this->db->select('id,first_name,last_name,email,password,user_type, image');
             $this->db->from('admin_users');
             $this->db->where('email', $username);
             $this->db->where('password', md5($password));
@@ -38,7 +38,8 @@ class Authentication extends CI_Controller {
                 if ($username == $usr && md5($password) == $pwd) {
                     $sess_data = array(
                         'username' => $username,
-                        'name' => $checkuser->name,
+                        'email' => $checkuser->email,
+                        'first_name' => $checkuser->first_name,
                         'last_name' => $checkuser->last_name,
                         'login_id' => $checkuser->id,
                         'user_type' => $checkuser->user_type,
@@ -64,7 +65,7 @@ class Authentication extends CI_Controller {
                         'icon' => 'happy.png'
                     );
                     $this->session->set_flashdata("checklogin", $message);
-                    redirect('Account/getContact');
+                     redirect("Account/getCollection", "refresh");
                 }
             } else {
                 $message = array(

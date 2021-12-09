@@ -146,16 +146,31 @@ class Api extends REST_Controller {
             return 'Message successfully delivered' . PHP_EOL;
     }
 
+    function getVisitor($title) {
+        $ipaddress = $this->input->ip_address();
+        $orderlog = array(
+            'log_type' => $title,
+            'log_datetime' => date('Y-m-d H:i:s'),
+            'user_id' => $ipaddress,
+            'order_id' => "",
+            'log_detail' => "$title has accessed from $ipaddress",
+        );
+        $this->db->insert('system_log', $orderlog);
+    }
+
     function getCollectionSingle_get($token, $id) {
         $this->db->where("id", $id);
         $query = $this->db->get("set_collection");
         $result = $query->row_array();
+        $title = $result["title"];
+        $this->getVisitor("Collection $title");
         $this->response($result);
     }
 
     function getCollection_get($token) {
         $query = $this->db->get("set_collection");
         $result = $query->result_array();
+        $this->getVisitor("Collections List");
         $this->response($result);
     }
 
@@ -163,11 +178,12 @@ class Api extends REST_Controller {
         $this->db->where("collection_id", $collection_id);
         $query = $this->db->get("set_collection_card");
         $result = $query->result_array();
+        $this->getVisitor("Cards ($collection_id) ");
         $this->response($result);
     }
 
     function accessCollection_post() {
-        $responsedata = array("status"=>"100", "message"=>"Collection code is wrong.");
+        $responsedata = array("status" => "100", "message" => "Collection code is wrong.");
         $collection_id = $this->post("collection_id");
         $access_code = $this->post("access_code");
         $this->db->where("id", $collection_id);
@@ -178,7 +194,14 @@ class Api extends REST_Controller {
             $responsedata["status"] = "200";
             $responsedata["message"] = "Collection code varified.";
         }
+        $message = $responsedata["message"];
+        $this->getVisitor("Cards $message ");
         $this->response($responsedata);
+    }
+
+    function getCardQr_get($card_code) {
+        $this->load->library('phpqr');
+        $this->phpqr->showcode($card_code);
     }
 
 }

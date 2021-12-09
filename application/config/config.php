@@ -25,10 +25,10 @@ $islocal = false;
 
 if (strpos($baselink, '192.168')) {
     $islocal = true;
-    $baselinkmain = 'http://' . $baselinkurl . '/padhaivadhaiapi';
+    $baselinkmain = 'http://' . $baselinkurl . '/wol';
 } elseif (strpos($baselink, 'localhost')) {
     $islocal = true;
-    $baselinkmain = 'http://' . $baselinkurl . '/padhaivadhaiapi';
+    $baselinkmain = 'http://' . $baselinkurl . '/wol';
 } else {
     $baselinkmain = 'https://' . $baselinkurl . '/';
 }

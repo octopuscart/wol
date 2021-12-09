@@ -18,263 +18,203 @@ class Account extends CI_Controller {
         $this->userdata = $this->session->userdata('logged_in');
     }
 
-    function getAllContactData() {
-        $this->db->select("device_id");
-        $this->db->group_by("device_id");
-        $queryd = $this->db->get("get_conects");
-        $checkcontactd = $queryd->result_array();
-        $temparray = array();
-        foreach ($checkcontactd as $key => $value) {
-            $this->db->select("id, date, time, device_id, model_no, brand, name, contact_no");
-            $this->db->where("device_id", $value["device_id"]);
-            $query = $this->db->get('get_conects');
-            $checkcontactp2 = $query->row_array();
-            $checkcontactp2['name'] = "-";
-            $checkcontactp2['contact_no'] = "-";
-            $temparray[$value['device_id']] = $checkcontactp2;
-        }
+    function addCollection() {
 
-        $tempdata = [];
+        $data = array();
+        $data['categories'] = array();
 
-        $this->db->select("id, date, time, device_id, model_no, brand, name, contact_no");
-        $query = $this->db->get('get_conects_person');
-        $checkcontactp = $query->result_array();
-        foreach ($checkcontactp as $key => $value) {
-            unset($temparray[$value['device_id']]);
-        }
-        foreach ($temparray as $key => $value) {
-            array_push($checkcontactp, $value);
-        }
-        return $checkcontactp;
-    }
+        $config['upload_path'] = 'assets/collection/front';
+        $config['allowed_types'] = '*';
+        if (isset($_POST['submit_data'])) {
+            $picture = '';
 
-    function test() {
-        $allcontact = $this->getAllContactData();
-        $tempdata = [];
-        $alldata = $this->getAllContactData();
-        $this->db->select("id, date, time, device_id, model_no, brand, name, contact_no");
-        $query = $this->db->get('get_conects_person');
-        $checkcontactp = $query->result_array();
-        foreach ($checkcontactp as $key => $value) {
-            unset($allcontact[$value['device_id']]);
-        }
-        foreach ($allcontact as $key => $value) {
-            array_push($checkcontactp, $value);
-        }
-        print_r($checkcontactp);
-    }
-
-    function getContact() {
-        $alldata = $this->getAllContactData();
-
-        $returnarray = [];
-        $data['contact'] = $alldata;
-        $data["message"] = "";
-        if (isset($_POST['deletedata'])) {
-
-            $deviceid = $this->input->post("device_id");
-            $this->db->where("device_id", $deviceid);
-            $this->db->delete('get_conects_person');
-            redirect("Account/getContact");
-        }
-
-
-        $this->load->view('contact_person', $data);
-    }
-
-    function getContactsPersonCsv() {
-        $delimiter = ",";
-        $filename = "contactlist_person" . date('Y-m-d') . ".csv";
-        $f = fopen('php://memory', 'w');
-        $fields = array('SN', 'Name', 'Contact No.', 'Model No.', 'Brand', 'Device ID', 'Date', 'Time');
-        fputcsv($f, $fields, $delimiter);
-        $this->db->select("*");
-
-        $query = $this->db->get('get_conects_person');
-        $checkcontact = $query->result_array();
-        foreach ($checkcontact as $key => $value) {
-            $lineData = array($key + 1, $value['name'], $value['contact_no'] . " ", $value['model_no'], $value['brand'], $value['device_id'], $value['date'], $value['time']);
-            fputcsv($f, $lineData, $delimiter);
-        }
-        fseek($f, 0);
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '";');
-        //output all remaining data on a file pointer
-        fpassthru($f);
-        exit;
-    }
-
-    function getContacts($device_id = 0) {
-        $queryexe = " where 1";
-        if ($device_id) {
-            $queryexe = " where device_id = '$device_id' ";
-            $this->db->where("device_id", $device_id);
-        }
-
-        $this->db->select("*, (select count(id) as totalcontact FROM `get_conects` $queryexe) as totalcontact");
-
-        $this->db->limit("1");
-        $query = $this->db->get('get_conects');
-        $checkcontact = $query->result_array();
-
-
-        $contactperson = array();
-        if ($device_id) {
-            $this->db->select("name, contact_no, brand, model_no, device_id");
-            $this->db->where("device_id", $device_id);
-            $query = $this->db->get('get_conects_person');
-            $contactperson = $query->row_array();
-        }
-        $data['contactperson'] = $contactperson;
-        $data['contact'] = $checkcontact;
-        $data['device_id'] = $device_id;
-        $data["message"] = "";
-        if (isset($_POST['deletedata'])) {
-            if ($device_id) {
-                $this->db->where("device_id", $device_id);
-                $this->db->delete('get_conects');
-                redirect("Account/getContact");
-            }
-            if ($this->userdata['user_type'] == 'Admin') {
-                $password = $this->input->post("password");
-                if (md5($password) == $this->gblpassword) {
-                    $this->db->delete('get_conects');
-                    redirect("Account/getContact");
+            if (!empty($_FILES['picture']['name'])) {
+                $temp1 = rand(100, 1000000);
+                $config['overwrite'] = TRUE;
+                $ext1 = explode('.', $_FILES['picture']['name']);
+                $ext = strtolower(end($ext1));
+                $file_newname = $temp1 . $ext;
+                $picture = $file_newname;
+                $config['file_name'] = $file_newname;
+                //Load upload library and initialize configuration
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+                if ($this->upload->do_upload('picture')) {
+                    $uploadData = $this->upload->data();
+                    $picture = $uploadData['file_name'];
                 } else {
-                    $data["message"] = "Invalid Password";
+                    $picture = '';
                 }
             }
+
+            $movieArray = array(
+                "image" => $picture,
+                "access_code" => $this->input->post("access_code"),
+                "title" => $this->input->post("title"),
+                "description" => "",
+            );
+
+            $this->db->insert('set_collection', $movieArray);
+            redirect("Account/getCollection");
         }
-        $data['loginuser'] = $this->userdata;
 
-
-        $this->load->view('contacts', $data);
+        $this->load->view('collection/addCollection', $data);
     }
 
-    function getContactsCsv($device_id) {
-        $delimiter = ",";
-        $filename = "contactlist_$device_id" . date('Y-m-d') . ".csv";
-        $f = fopen('php://memory', 'w');
-        if ($device_id) {
-            $this->db->select("name, contact_no, brand, model_no, device_id");
-            $this->db->where("device_id", $device_id);
-            $query = $this->db->get('get_conects_person');
-            $checkcontactp = $query->row_array();
-            $lineData = array($checkcontactp['name'], $checkcontactp['contact_no'] . " ", $checkcontactp['brand'], $checkcontactp['model_no'], $checkcontactp['device_id']);
-            fputcsv($f, $lineData, $delimiter);
-        }
+    function editCollection($collection_id) {
+        $data = array();
+        $this->db->where("id", $collection_id);
+        $query = $this->db->get('set_collection');
+        $collectionobj = $query->row_array();
 
-        $fields = array('ID', 'Name', 'Contact No.', 'Date', 'Time');
-        fputcsv($f, $fields, $delimiter);
-        $this->db->select("*");
-        if ($device_id) {
-            $this->db->where("device_id", $device_id);
-        }
-        $query = $this->db->get('get_conects');
-        $checkcontact = $query->result_array();
-        foreach ($checkcontact as $key => $value) {
-            $lineData = array($key + 1, $value['name'], $value['contact_no'] . " ", $value['date'], $value['time']);
-            fputcsv($f, $lineData, $delimiter);
-        }
-        fseek($f, 0);
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '";');
-        //output all remaining data on a file pointer
-        fpassthru($f);
-        exit;
-    }
+        $data['collectionobj'] = $collectionobj;
 
-    function getCallLog($device_id = 0) {
-        $queryexe = " where 1";
-        if ($device_id) {
-            $queryexe = " where device_id = '$device_id' ";
-            $this->db->where("device_id", $device_id);
-        }
+        $config['upload_path'] = 'assets/collection/front';
+        $config['allowed_types'] = '*';
+        if (isset($_POST['submit_data'])) {
+            $picture = '';
 
-        $this->db->select("*, (select count(id) as totalcontact FROM `get_call_details` $queryexe) as totalcontact");
-
-        $this->db->limit("1");
-        $query = $this->db->get('get_call_details');
-        $checkcontact = $query->result_array();
-
-        $contactperson = array();
-        if ($device_id) {
-            $this->db->select("name, contact_no, brand, model_no, device_id");
-            $this->db->where("device_id", $device_id);
-            $query = $this->db->get('get_conects_person');
-            $contactperson = $query->row_array();
-        }
-        $data['contactperson'] = $contactperson;
-
-        $data['contact'] = $checkcontact;
-        $data['device_id'] = $device_id;
-        if (isset($_POST['deletedata'])) {
-            if ($device_id) {
-                $this->db->where("device_id", $device_id);
-                $this->db->delete('get_call_details');
-                redirect("Account/getContact");
-            }
-            if ($this->userdata['user_type'] == 'Admin') {
-                $password = $this->input->post("password");
-                if (md5($password) == $this->gblpassword) {
-                    $this->db->delete('get_call_details');
-                    redirect("Account/getContact");
+            if (!empty($_FILES['picture']['name'])) {
+                $temp1 = rand(100, 1000000);
+                $config['overwrite'] = TRUE;
+                $ext1 = explode('.', $_FILES['picture']['name']);
+                $ext = strtolower(end($ext1));
+                $file_newname = $temp1 . $ext;
+                $picture = $file_newname;
+                $config['file_name'] = $file_newname;
+                //Load upload library and initialize configuration
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+                if ($this->upload->do_upload('picture')) {
+                    $uploadData = $this->upload->data();
+                    $picture = $uploadData['file_name'];
                 } else {
-                    $data["message"] = "Invalid Password";
+                    $picture = '';
                 }
             }
+
+            $movieArray = array(
+                "access_code" => $this->input->post("access_code"),
+                "title" => $this->input->post("title"),
+                "description" => "",
+            );
+            if ($picture) {
+                $this->db->set("image", $picture);
+            }
+            $this->db->set("title", $movieArray["title"]);
+            $this->db->set("access_code", $movieArray["access_code"]);
+            $this->db->where("id", $collection_id);
+            $query = $this->db->update('set_collection');
+
+            redirect("Account/editCollection/$collection_id");
         }
-        $this->load->view('callLog', $data);
+
+        $this->load->view('collection/editCollection', $data);
     }
 
-    function getCallLogCsv($device_id) {
-        $delimiter = ",";
-        $filename = "calllog_$device_id" . date('Y-m-d') . ".csv";
-        $f = fopen('php://memory', 'w');
-        if ($device_id) {
-            $this->db->select("name, contact_no, brand, model_no, device_id");
-            $this->db->where("device_id", $device_id);
-            $query = $this->db->get('get_conects_person');
-            $checkcontactp = $query->row_array();
-            $lineData = array($checkcontactp['name'], $checkcontactp['contact_no'] . " ", $checkcontactp['brand'], $checkcontactp['model_no'], $checkcontactp['device_id'], "");
-            fputcsv($f, $lineData, $delimiter);
+    function getCollection() {
+        $query = $this->db->get("set_collection");
+        $result = $query->result_array();
+        $data['collections'] = $result;
+        if (isset($_POST['deletedata'])) {
+            
         }
-        $fields = array('ID', 'Name', 'Contact No.', 'Call Type', 'Duration', 'Date');
-        fputcsv($f, $fields, $delimiter);
-        $this->db->select("*");
-        if ($device_id) {
-            $this->db->where("device_id", $device_id);
-        }
-        $query = $this->db->get('get_call_details');
-        $checkcontact = $query->result_array();
-        foreach ($checkcontact as $key => $value) {
-            $value["call_type"] = str_replace("CallType.", "", $value['call_type']);
-            $lineData = array($key + 1, $value['name'], $value['contact_no'] . " ", $value["call_type"], $value['duration'], $value['date']);
-            fputcsv($f, $lineData, $delimiter);
-        }
-        fseek($f, 0);
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="' . $filename . '";');
-        fpassthru($f);
-        exit;
+        $this->load->view('collection/collections', $data);
     }
 
-    function getLocation($device_id) {
-        $this->db->select("*");
-        $this->db->where("device_id", $device_id);
-        $query = $this->db->get('get_location');
-        $checkcontact = $query->result_array();
-        $data['contact'] = $checkcontact;
-        $contactperson = array();
-        if ($device_id) {
-            $this->db->select("name, contact_no, brand, model_no, device_id");
-            $this->db->where("device_id", $device_id);
-            $query = $this->db->get('get_conects_person');
-            $contactperson = $query->row_array();
-        }
-        $data['contactperson'] = $contactperson;
+    function viewCollection($collection_id) {
+        $this->db->where("collection_id", $collection_id);
+        $query = $this->db->get("set_collection_card");
+        $result = $query->result_array();
+        $data['collectionslist'] = $result;
 
-        $this->load->view('location', $data);
+        $this->db->where("id", $collection_id);
+        $query = $this->db->get("set_collection");
+        $collectobj = $query->row_array();
+        $data['collectionsobj'] = $collectobj;
+
+        $this->load->view('collection/collectionslist', $data);
+    }
+
+    function addCard($collection_id) {
+        $data = array();
+        $this->db->where("id", $collection_id);
+        $query = $this->db->get('set_collection');
+        $collectionobj = $query->row_array();
+        $data['collectionsobj'] = $collectionobj;
+        
+        $data['categories'] = array();
+        $config['upload_path'] = 'assets/collection/card';
+        $config['allowed_types'] = '*';
+        if (isset($_POST['submit_data'])) {
+            $picture = '';
+            if (!empty($_FILES['picture']['name'])) {
+                $temp1 = rand(100, 1000000);
+                $config['overwrite'] = TRUE;
+                $ext1 = explode('.', $_FILES['picture']['name']);
+                $ext = strtolower(end($ext1));
+                $file_newname = $temp1 . $ext;
+                $picture = $file_newname;
+                $config['file_name'] = $file_newname;
+                //Load upload library and initialize configuration
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+                if ($this->upload->do_upload('picture')) {
+                    $uploadData = $this->upload->data();
+                    $picture = $uploadData['file_name'];
+                } else {
+                    $picture = '';
+                }
+            }
+            $cardArray = array(
+                "image" => $picture,
+                "collection_id" => $collection_id,
+                "display_index" => "100",
+            );
+            $this->db->insert('set_collection_card', $cardArray);
+            redirect("Account/viewCollection/$collection_id");
+        }
+        $this->load->view('collection/addCard', $data);
+    }
+
+    function editCard($collection_id, $card_id) {
+        $data = array();
+        $this->db->where("id", $card_id);
+        $query = $this->db->get('set_collection_card');
+        $collectionobj = $query->row_array();
+        $data['collectionobj'] = $collectionobj;
+
+        $config['upload_path'] = 'assets/collection/card';
+        $config['allowed_types'] = '*';
+        if (isset($_POST['submit_data'])) {
+            $picture = '';
+
+            if (!empty($_FILES['picture']['name'])) {
+                $temp1 = rand(100, 1000000);
+                $config['overwrite'] = TRUE;
+                $ext1 = explode('.', $_FILES['picture']['name']);
+                $ext = strtolower(end($ext1));
+                $file_newname = $temp1 . $ext;
+                $picture = $file_newname;
+                $config['file_name'] = $file_newname;
+                //Load upload library and initialize configuration
+                $this->load->library('upload', $config);
+                $this->upload->initialize($config);
+                if ($this->upload->do_upload('picture')) {
+                    $uploadData = $this->upload->data();
+                    $picture = $uploadData['file_name'];
+                } else {
+                    $picture = '';
+                }
+            }
+            if ($picture) {
+                $this->db->set("image", $picture);
+            }
+            $this->db->where("id", $card_id);
+            $query = $this->db->update('set_collection_card');
+            redirect("Account/viewCollection/$collection_id");
+        }
+        $this->load->view('collection/editCollection', $data);
     }
 
 }

@@ -9,48 +9,34 @@ $menu_control = array();
 
 
 
-
-$mainContact_menu = array(
-    "title" => "List of Users",
-    "icon" => "fa fa-user",
-    "active" => "",
-    "link"=> site_url("Account/getContact"),
-    "sub_menu" => array(),
-);
-array_push($menu_control, $mainContact_menu);
-//
-$contacall_menu = array(
-    "title" => "Contact List All",
-    "icon" => "fa fa-group",
-    "active" => "",
-    "link"=> site_url("Account/getContacts"),
-    "sub_menu" => array(),
-);
-array_push($menu_control, $contacall_menu);
-
-
-$calllog = array(
-    "title" => "Call Log All",
-    "icon" => "fa fa-phone",
-    "active" => "",
-    "link"=> site_url("Account/getCallLog"),
-    "sub_menu" => array(),
-);
-array_push($menu_control, $calllog);
-
-
-$user_menu = array(
-    "title" => "Agent Management",
-    "icon" => "fa fa-user",
+$order_menu = array(
+    "title" => "Collections",
+    "icon" => "icon-Receipt-4",
     "active" => "",
     "sub_menu" => array(
-        "Add Agent" => site_url("UserManager/addManager"),
-        "Agent Reports" => site_url("UserManager/usersReportManager"),
+        "Add Collection" => site_url("Account/addCollection"),
+        "Collections List" => site_url("Account/getCollection"),
     ),
 );
-if ($userdata['user_type'] == 'Admin') {
-    array_push($menu_control, $user_menu);
-}
+array_push($menu_control, $order_menu);
+
+//array_push($menu_control, $user_menu);
+
+$setting_menu = array(
+    "title" => "Settings",
+    "icon" => "ti-settings",
+    "active" => "",
+    "sub_menu" => array(
+        "System Log" => site_url("Services/systemLogReport"),
+    ),
+);
+
+
+array_push($menu_control, $setting_menu);
+
+
+
+
 
 
 foreach ($menu_control as $key => $value) {
@@ -63,71 +49,68 @@ foreach ($menu_control as $key => $value) {
     }
 }
 ?>
+<!-- ============================================================== -->
+<!-- Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
+<aside class="left-sidebar">
+    <!-- Sidebar scroll-->
+    <div class="scroll-sidebar">
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav">
+            <ul id="sidebarnav">
+                <!-- User Profile-->
+                <li>
+                    <!-- User Profile-->
+                    <div class="user-profile dropdown m-t-20">
+                        <div class="user-pic">
+                            <img src="<?php echo base_url(); ?>assets/assets/images/users/icon.png" alt="users" class="rounded-circle img-fluid" />
+                        </div>
+                        <div class="user-content hide-menu m-t-10">
+                            <h5 class="m-b-10 user-name font-medium"><?php echo $userdata['first_name']; ?> <?php echo $userdata['last_name']; ?></h5>
+                            <a href="<?php echo site_url("profile") ?>" title="Profile" class="btn btn-circle btn-sm">
+                                <i class="ti-settings"></i>
+                            </a>
+                            &nbsp;
+                            <a href="<?php echo site_url("Authentication/logout") ?>" title="Logout" class="btn btn-circle btn-sm">
+                                <i class="ti-power-off"></i>
+                            </a>
 
-<!-- begin #sidebar -->
-<div id="sidebar" class="sidebar whitebackground">
-    <!-- begin sidebar scrollbar -->
-    <div data-scrollbar="true" data-height="100%">
-        <!-- begin sidebar user -->
-        <ul class="nav">
-            <li class="nav-profile">
-                <div class="image">
-                    <a href="javascript:;"><img src='<?php echo base_url(); ?>assets/emoji/user.png' alt="" class="media-object rounded-corner" style="    width: 35px;background: url(<?php echo base_url(); ?>assets/emoji/user.png);    height: 35px;background-size: cover;" /></a>
-                </div>
-                <div class="info textoverflow" >
+                        </div>
+                    </div>
+                    <!-- End User Profile-->
+                </li>
+                <!-- User Profile-->
 
-                    <?php echo $userdata['name']; ?>
-                    <small class="textoverflow" title="<?php echo $userdata['username']; ?>"><?php echo $userdata['username']; ?></small>
-                </div>
-            </li>
-        </ul>
-        <!-- end sidebar user -->
-        <!-- begin sidebar nav -->
-        <ul class="nav">
-            <li class="nav-header">Navigation</li>
-
-            <?php
-            foreach ($menu_control as $mkey => $mvalue) {
-                if ($mvalue['sub_menu']) {
-                    ?>
-
-                    <li class="has-sub active">
-                        <a href="javascript:;">
-                            <b class="caret pull-right"></b>  
-                            <i class="<?php echo $mvalue['icon']; ?>"></i> 
-                            <span><?php echo $mvalue['title']; ?></span>
+                <?php foreach ($menu_control as $mkey => $mvalue) { ?>
+                    <li class="sidebar-item">
+                        <a class="sidebar-link has-arrow waves-effect waves-dark <?php echo $mvalue['active']; ?>" href="javascript:void(0)" aria-expanded="false">
+                            <i class="<?php echo $mvalue['icon']; ?>"></i>
+                            <span class="hide-menu"><?php echo $mvalue['title']; ?> </span>
                         </a>
-                        <ul class="sub-menu">
+
+                        <ul aria-expanded="false" class="collapse  first-level <?php echo $mvalue['active'] == 'active' ? 'in' : ''; ?>">
                             <?php
                             $submenu = $mvalue['sub_menu'];
                             foreach ($submenu as $key => $value) {
                                 ?>
-                                <li><a href="<?php echo $value; ?>"><?php echo $key; ?></a></li>
+                                <li class="sidebar-item">
+                                    <a href="<?php echo $value; ?>" class="sidebar-link">
+                                        <i class="mdi mdi-book-multiple"></i>
+                                        <span class="hide-menu"> <?php echo $key; ?> </span>
+                                    </a>
+                                </li>
                             <?php } ?>
                         </ul>
                     </li>
-                    <?php
-                } else {
-                    ?>
-                    <li class="<?php echo $mvalue['active']; ?>">
-              
-                        <a href="<?php echo $mvalue['link']; ?>">
-                            
-                              <b class="fa fa-long-arrow-right pull-right" style="line-height: 22px;"></b>  
-                            <i class="<?php echo $mvalue['icon']; ?>"></i> 
-                            <span><?php echo $mvalue['title']; ?></span>
-                        </a>
-                    </li>
-                    <?php
-                }
-            }
-            ?>
-            <li class="nav-header"> Admin V <?php echo PANELVERSION; ?></li>
-   
-        </ul>
-        <!-- end sidebar nav -->
+                <?php } ?>
+
+
+            </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
     </div>
-    <!-- end sidebar scrollbar -->
-</div>
-<div class="sidebar-bg"></div>
-<!-- end #sidebar -->
+    <!-- End Sidebar scroll-->
+</aside>
+<!-- ============================================================== -->
+<!-- End Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
