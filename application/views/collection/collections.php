@@ -37,11 +37,12 @@ $this->load->view('layout/topmenu');
                                     </div>
                                     <div class="el-card-item text-center" style="padding: 10px">
                                         <a class="btn btn-md btn-block btn-dark text-light" href="<?php echo site_url("Account/viewCollection/" . $value["id"]); ?>">View Collection</a>
-                                        <div class="btn btn-group btn-block">
+                                        <div class="btn btn-group " style="    display: block;">
                                             <button class="btn btn-md btn-primary text-light" href="" data-toggle="modal" data-target="#viewserialno" ng-click="viewQrcode('<?php echo $value['access_code']; ?>')">View QR</button>
-                                            <a class="btn btn-md btn-danger text-light" href="<?php echo site_url("Account/editCollection/" . $value["id"]); ?>">Update</a>
+                                            <a class="btn btn-md btn-warning text-light" href="<?php echo site_url("Account/editCollection/" . $value["id"]); ?>">Update</a>
 
                                         </div>
+                                        <button type="button" class="btn btn-danger" ng-click="confirmDelete(<?php echo $value["id"]; ?>)">Remove Collection</button>
                                     </div>
                                 </div>
                             </div>
@@ -83,24 +84,47 @@ $this->load->view('layout/footer');
 ?>
 <script>
     Admin.controller('collectionController', function ($scope, $http, $timeout, $interval) {
-        $scope.selectedcard = {"code": "123"};
-        $scope.viewQrcode = function (code) {
-            console.log(code);
-            $scope.selectedcard.code = code;
-        }
+    $scope.selectedcard = {"code": "123"};
+    $scope.viewQrcode = function (code) {
+    console.log(code);
+    $scope.selectedcard.code = code;
+    }
+    $scope.confirmDelete = function (remove_id) {
+    swal({
+    title: "Please confirm",
+            text: "Are you sure want to remove this collection?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Remove it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: false
+    }).then(
+            function () {
+            window.location = "<?php echo site_url("Account/removeCollection/") ?>" + remove_id;
+            console.log("yes pressed", remove_id);
+            },
+            function (dismiss) {
+            if (dismiss === 'timer') {
+
+            }
+            }
+    );
+    }
+
+
     });
 <?php
 $checklogin = $this->session->flashdata('checklogin');
-if ($checklogin['show']) {
+if (isset($checklogin['show'])) {
     ?>
         $.gritter.add({
-            title: "<?php echo $checklogin['title']; ?>",
-            text: "<?php echo $checklogin['text']; ?>",
-            image: '<?php echo base_url(); ?>assets/emoji/<?php echo $checklogin['icon']; ?>',
-                    sticky: true,
-                    time: '',
-                    class_name: 'my-sticky-class '
-                });
+        title: "<?php echo $checklogin['title']; ?>",
+                text: "<?php echo $checklogin['text']; ?>",
+                image: '<?php echo base_url(); ?>assets/emoji/<?php echo $checklogin['icon']; ?>',
+                            sticky: true,
+                            time: '',
+                            class_name: 'my-sticky-class '
+                    });
     <?php
 }
 ?>

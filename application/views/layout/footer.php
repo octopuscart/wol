@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="myModalLabel">&nbsp;</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
             </div>
             <div class="modal-body">
@@ -71,8 +71,41 @@ $(function () {
         BoxedLayout: false // it can be true / false ( true means Boxed and false means Fluid )
     });
 });
+
 </script>
 
+<script>
+
+    function shortData() {
+        let card_indexs = [];
+        let card_ids = [];
+        $("#sortable .display_index").each(function (i) {
+            $(this).html(i + 1);
+            card_ids.push(this.id.replace("card_id_", ""));
+        });
+        console.log(card_indexs, card_ids);
+        $("#form_card_id").val(card_ids.join(","));
+ 
+    }
+    $(function () {
+        shortData();
+        $("#sortable").sortable({
+            revert: true,
+            stop: function () {
+                shortData();
+                 $("#shoringconfirmbox").show();
+            }
+        });
+       
+        $("ul, li").disableSelection();
+         $("#shoringconfirmbox").hide();
+        $("#cancelreindex").click(function(){
+            $("#shoringconfirmbox").hide();
+        })
+    });
+    
+    
+</script>
 
 </body>
 </html>

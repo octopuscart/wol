@@ -116,24 +116,40 @@ class Account extends CI_Controller {
         $query = $this->db->get("set_collection");
         $result = $query->result_array();
         $data['collections'] = $result;
-        if (isset($_POST['deletedata'])) {
-            
-        }
         $this->load->view('collection/collections', $data);
+    }
+
+    function removeCollection($collection_id) {
+        $this->db->where("id", $collection_id)->delete("set_collection");
+        redirect(site_url("Account/getCollection"));
     }
 
     function viewCollection($collection_id) {
         $this->db->where("collection_id", $collection_id);
-        $query = $this->db->get("set_collection_card");
+        $query = $this->db->order_by("display_index")->get("set_collection_card");
         $result = $query->result_array();
         $data['collectionslist'] = $result;
+        $data['ccollection_id'] = $collection_id;
 
         $this->db->where("id", $collection_id);
         $query = $this->db->get("set_collection");
         $collectobj = $query->row_array();
         $data['collectionsobj'] = $collectobj;
+        if (isset($_POST['reindex'])) {
+            $index_id = $this->input->post("card_id");
+            $index_id_list = explode(",", $index_id);
+            foreach ($index_id_list as $key => $value) {
+                $this->db->set("display_index", $key)->where("id", $value)->update("set_collection_card");
+            }
+            redirect("Account/viewCollection/$collection_id");
+        }
 
         $this->load->view('collection/collectionslist', $data);
+    }
+
+    function removeCollectionCard($card_id, $collection_id) {
+        $this->db->where("id", $card_id)->delete("set_collection_card");
+        redirect(site_url("Account/viewCollection/$collection_id"));
     }
 
     function addCard($collection_id) {
@@ -142,12 +158,13 @@ class Account extends CI_Controller {
         $query = $this->db->get('set_collection');
         $collectionobj = $query->row_array();
         $data['collectionsobj'] = $collectionobj;
-        
+
         $data['categories'] = array();
-        $config['upload_path'] = 'assets/collection/card';
+        $config['upload_path'] = 'assets/collection/cards';
         $config['allowed_types'] = '*';
         if (isset($_POST['submit_data'])) {
             $picture = '';
+
             if (!empty($_FILES['picture']['name'])) {
                 $temp1 = rand(100, 1000000);
                 $config['overwrite'] = TRUE;
@@ -166,6 +183,7 @@ class Account extends CI_Controller {
                     $picture = '';
                 }
             }
+//            print_r($picture);
             $cardArray = array(
                 "image" => $picture,
                 "collection_id" => $collection_id,

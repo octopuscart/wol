@@ -176,7 +176,7 @@ class Api extends REST_Controller {
 
     function getCollectionCard_get($token, $collection_id) {
         $this->db->where("collection_id", $collection_id);
-        $query = $this->db->get("set_collection_card");
+        $query = $this->db->order_by("display_index")->get("set_collection_card");
         $result = $query->result_array();
         $this->getVisitor("Cards ($collection_id) ");
         $this->response($result);
