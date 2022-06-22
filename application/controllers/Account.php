@@ -106,7 +106,7 @@ class Account extends CI_Controller {
             $this->db->where("id", $collection_id);
             $query = $this->db->update('set_collection');
 
-            redirect("Account/editCollection/$collection_id");
+            redirect("Account/getCollection");
         }
 
         $this->load->view('collection/editCollection', $data);

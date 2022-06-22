@@ -74,7 +74,7 @@ $this->load->view('layout/topmenu');
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <button type="submit" name="submit_data" class="btn btn-primary p-l-40 p-r-40">Add New Collection</button>
+                                                <button type="submit" name="submit_data" class="btn btn-primary p-l-40 p-r-40">Update Collection</button>
                                             </div>
                                         </div>
 
